@@ -1,0 +1,50 @@
+# =======================
+# Python
+# =======================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyd
+
+# =======================
+# Virtual Environment
+# =======================
+venv/
+env/
+ENV/
+.venv/
+# If using pipenv or poetry
+Pipfile.lock
+poetry.lock
+
+# =======================
+# Byte-compiled / cache
+# =======================
+*.egg-info/
+*.egg
+*.eggs
+*.sqlite3
+
+# =======================
+# OS Files
+# =======================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# =======================
+# Streamlit
+# =======================
+.streamlit/
+
+# =======================
+# Data / local files
+# =======================
+*.csv
+*.pkl
+*.db
+*.sqlite
+
