@@ -1,6 +1,13 @@
-# 🎬 Netflix-Style AI Movie Recommender
+# 🎬  AI Movie Recommender
+movie-recommender/
+│
+├─ app.py                # Main Streamlit app
+├─ background.png        # Netflix-style background
+├─ requirements.txt      # Dependencies
+├─ .gitignore            # Files/folders to ignore in Git
+└─ readme.md             # Project documentation
 
-A modern, Netflix-style movie recommendation web app built with **Streamlit** and **TMDB API**.  
+A modern movie recommendation web app built with **Streamlit** and **TMDB API**.  
 It provides:
 
 - ✅ Movie search (manual & autocomplete style)  
