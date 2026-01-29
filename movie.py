@@ -239,3 +239,4 @@ else:
                     st.markdown('</div>', unsafe_allow_html=True)
                 st.caption(movie["title"])
                 st.markdown(f"<div class='rating'>⭐ {movie.get('vote_average','N/A')}</div>", unsafe_allow_html=True)
+#movie recommender
