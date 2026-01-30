@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.metrics.pairwise import cosine_similarity
 import base64
 
 # ================= CONFIG =================
@@ -165,78 +165,71 @@ for genre, gid in genres.items():
             st.markdown(f"<div class='rating'>⭐ {m.get('vote_average','N/A')}</div>", unsafe_allow_html=True)
 
 # ================= AI SIMILAR RECOMMENDER (NETFLIX STYLE) =================
+# ================= AI SIMILAR MOVIES (TMDB) =================
 st.divider()
+
 st.markdown(
     """
-    <style>
-    .section-title {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 2.2rem;
-        color: #e50914;
-        text-shadow: 0 0 20px #e50914;
-        animation: glow 2s infinite alternate;
-        margin-top: 40px;
-    }
-
-    @keyframes glow {
-        0% { text-shadow: 0 0 10px #e50914; }
-        50% { text-shadow: 0 0 35px #e50914; }
-        100% { text-shadow: 0 0 10px #e50914; }
-    }
-
-    .ai-card img {
-        border-radius: 14px;
-        transition: transform .3s ease, box-shadow .3s ease;
-    }
-    .ai-card img:hover {
-        transform: scale(1.08) translateY(-5px);
-        box-shadow: 0px 20px 40px rgba(229,9,20,.7);
-    }
-
-    .ai-rating {
-        color: gold;
-        font-weight: 600;
-        text-align: center;
-    }
-    </style>
-    """, unsafe_allow_html=True
+    <h2 style="
+        color:#e50914;
+        font-family:'Bebas Neue', sans-serif;
+        letter-spacing:2px;
+        animation: glow 2s infinite;
+    ">
+    🤖 AI Similar Movie Recommendation
+    </h2>
+    """,
+    unsafe_allow_html=True
 )
 
-st.markdown('<div class="section-title">🤖 AI Similar Movies </div>', unsafe_allow_html=True)
+# Collect unique movies (avoid duplicates)
+movie_dict = {}
+for m in all_movies:
+    if m.get("title") and m.get("id"):
+        movie_dict[m["title"]] = m["id"]
 
-valid_movies = [
-    m for m in all_movies
-    if m.get("overview") and m.get("title")
-]
-
-if len(valid_movies) < 11:
-    st.info("Search or browse more movies to activate AI recommendations.")
+if not movie_dict:
+    st.warning("Search or load movies first to enable AI recommendations.")
 else:
-    titles = [m["title"] for m in valid_movies]
-    overviews = [m["overview"] for m in valid_movies]
+    selected_movie = st.selectbox(
+        "🎬 Select a movie",
+        list(movie_dict.keys())
+    )
 
-    selected_movie = st.selectbox("🎬 Choose a movie", titles)
+    if st.button("🎯 Recommend Similar Movies"):
+        movie_id = movie_dict[selected_movie]
 
-    if st.button("🎯 Recommend"):
-        tfidf = TfidfVectorizer(stop_words="english", max_features=6000)
-        vectors = tfidf.fit_transform(overviews)
-        similarity = cosine_similarity(vectors)
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}/similar"
+        params = {
+            "api_key": TMDB_API_KEY,
+            "language": "en-US",
+            "page": 1
+        }
 
-        idx = titles.index(selected_movie)
-        scores = sorted(
-            list(enumerate(similarity[idx])),
-            key=lambda x: x[1],
-            reverse=True
-        )[1:6]
+        try:
+            response = requests.get(url, params=params, timeout=10)
+            response.raise_for_status()
+            recommendations = response.json().get("results", [])
+        except:
+            recommendations = []
 
-        cols = st.columns(5)
-        for col, (i, _) in zip(cols, scores):
-            movie = valid_movies[i]
-            with col:
-                if movie.get("poster_path"):
-                    st.markdown('<div class="ai-card">', unsafe_allow_html=True)
-                    st.image(IMG_BASE + movie["poster_path"])
-                    st.markdown('</div>', unsafe_allow_html=True)
-                st.caption(movie["title"])
-                st.markdown(f"<div class='rating'>⭐ {movie.get('vote_average','N/A')}</div>", unsafe_allow_html=True)
-#movie recommender
+        if not recommendations:
+            st.warning("No similar movies found.")
+        else:
+            cols = st.columns(5)
+
+            for i, movie in enumerate(recommendations[:10]):
+                with cols[i % 5]:
+                    if movie.get("poster_path"):
+                        st.markdown(
+                            '<div class="movie-card fade-in">',
+                            unsafe_allow_html=True
+                        )
+                        st.image(IMG_BASE + movie["poster_path"])
+                        st.markdown("</div>", unsafe_allow_html=True)
+
+                    st.caption(movie["title"])
+                    st.markdown(
+                        f"<div class='rating'>⭐ {movie.get('vote_average','N/A')}</div>",
+                        unsafe_allow_html=True
+                    )
