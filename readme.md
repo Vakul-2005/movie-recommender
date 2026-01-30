@@ -1,7 +1,7 @@
 # 🎬  AI Movie Recommender
 movie-recommender/
 │
-├─ app.py                # Main Streamlit app
+├─ movie.py                # Main Streamlit app
 ├─ background.png        # Netflix-style background
 ├─ requirements.txt      # Dependencies
 ├─ .gitignore            # Files/folders to ignore in Git
